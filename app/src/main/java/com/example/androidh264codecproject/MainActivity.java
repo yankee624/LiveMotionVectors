@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -14,6 +15,12 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.androidh264codecproject.decoder.FFmpegAVCDecoder;
+import com.example.androidh264codecproject.decoder.FFmpegAVIDecoder;
+import com.example.androidh264codecproject.encoder.MotionVectorList;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -78,9 +85,19 @@ public class MainActivity extends AppCompatActivity {
 
         // Transfer AVI to H264
         //new AVCEncoderDataSetThread().start();
+        FFmpegAVIDecoder decoder = new FFmpegAVIDecoder();
+        decoder.setInputFilename("/storage/emulated/0/bus.yuv");
+        decoder.setVideoInfo(1920,1080);
+        try{
+            decoder.prepare();
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+
     }
 
     private void checkStoragePermission() {
+
         if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             if (this.shouldShowRequestPermissionRationale(Manifest.permission
@@ -89,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             this.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-
         } else {
+
             //Toast.makeText(this, "授权成功！", Toast.LENGTH_SHORT).show();
             //Log.e(TAG_SERVICE, "checkPermission: 已经授权！");
         }

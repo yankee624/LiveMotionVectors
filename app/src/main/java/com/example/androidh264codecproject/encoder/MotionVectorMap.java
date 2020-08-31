@@ -28,6 +28,9 @@ public class MotionVectorMap {
     public int[] getData() {
         return this.data;
     }
+    public int getWidth() { return this.width; }
+    public int getHeight() { return this.height; }
+
 
     public static void deleteMotionVectorMapFileIfExist() {
         new File(DEFAULT_SAVE_FILEPATH).deleteOnExit();

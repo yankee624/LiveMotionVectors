@@ -1,10 +1,14 @@
 package com.example.androidh264codecproject;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.androidh264codecproject.decoder.FFmpegAVCDecoderCallback;
 import com.example.androidh264codecproject.encoder.EncodeMode;
 
 public class AVCEncoderTestActivity extends Activity {
@@ -30,10 +34,12 @@ public class AVCEncoderTestActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_avcencoder_test);
 
+        checkStoragePermission();
         initUI();
     }
 
     private void initUI() {
+
         Button syncButton = (Button) findViewById(R.id.sync_button);
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,6 +59,28 @@ public class AVCEncoderTestActivity extends Activity {
                 t.start();
             }
         });
+    }
+
+    private void checkStoragePermission() {
+
+        if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (this.shouldShowRequestPermissionRationale(Manifest.permission
+                    .WRITE_EXTERNAL_STORAGE)) {
+                //Toast.makeText(this, "请开通相关权限，否则无法正常使用本应用！", Toast.LENGTH_SHORT).show();
+            }
+
+            this.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        } else {
+            print("pass");
+
+            //Toast.makeText(this, "授权成功！", Toast.LENGTH_SHORT).show();
+            //Log.e(TAG_SERVICE, "checkPermission: 已经授权！");
+        }
+    }
+
+    private void print(String msg){
+        Log.e("tag", msg);
     }
 
 }

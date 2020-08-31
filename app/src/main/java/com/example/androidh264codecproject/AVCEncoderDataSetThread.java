@@ -106,152 +106,152 @@ public class AVCEncoderDataSetThread extends Thread {
     @Override
     public void run() {
         super.run();
-
-        try {
-            // Print setting
-            Log.i(TAG, String.format(Locale.CHINA,
-                    "Current setting is\n" +
-                            "Video Size:%d*%d\n" +
-                            "Frame Rate:%d\n" +
-                            "Bitrate:%d\n" +
-                            "Start Index:%d", videoWidth, videoHeight, frameRate, bitrate, startIndex));
-
-            // Count down for 3 seconds
-            Log.i(TAG, "Task will start after 3s");
-            int countDown = 3;
-            while (countDown >= 0) {
-                updateCountDownInUI(countDown);
-                countDown --;
-                Thread.sleep(1000);
-                // Maybe pause during count down
-                if (exitFlag) {
-                    updateInitProgressInUI();
-                    return;
-                }
-            }
-
-            final String sdCardDirectory = "/storage/emulated/0/";
-
-            String listPath;
-            switch (datasetIndex) {
-                case 0:
-                case 1:
-                    listPath = datalistPath[0];
-                    break;
-                case 2:
-                    listPath = datalistPath[1];
-                    break;
-                case 3:
-                    listPath = datalistPath[2];
-                    break;
-                default:
-                    listPath = null;
-            }
-
-            DataSetLoader loader = new DataSetLoader(
-                    // List File
-                    sdCardDirectory + listPath,
-                    // Input File Directory
-                    sdCardDirectory + datasetPath[datasetIndex],
-                    // Output File Directory
-                    sdCardDirectory + "LocalAction/UCF-101-H264");
-            Log.i(TAG, "Dataset loader created");
-
-            int videoIndex = 0;
-            //int videoCount = Integer.MAX_VALUE;
-            //int endIndex = startIndex + videoCount;
-            boolean ret;
-            String filePath;
-            File file;
-            AVCEncoder encoder = null;
-            long startMs = 0;
-
-            while (!exitFlag && (filePath = loader.getNextFileItemPath(DataSetLoader.TYPE_AVI)) != null) {
-                //Log.i("DataSetLoader", String.format(Locale.CHINA, "Load file %s", filePath));
-
-                // Check input file path
-                file = new File(filePath);
-                if (!file.exists()) {
-                    continue;
-                }
-                // Skip video before start index
-                if (videoIndex < startIndex) {
-                    // Update process
-                    updateProgressInUI(videoIndex, String.format(Locale.CHINA, "Skip %s", loader.getCurrentFileName()));
-                    videoIndex ++;
-                    continue;
-                }
-
-                String outFilePath = loader.getCurrentOutFileItemPath(DataSetLoader.TYPE_H264);
-
-                // Check output file path
-                file = new File(outFilePath).getParentFile();
-                if (!file.exists()) {
-                    ret = file.mkdirs();
-                }
-
-                String inputAVIFilePath = filePath;
-                String outputH264Path   = outFilePath;
-
-                // Create and initialize ffmpeg avi decoder
-                FFmpegAVIDecoder decoder = new FFmpegAVIDecoder();
-                decoder.setInputFilename(inputAVIFilePath);
-                decoder.setVideoInfo(videoWidth, videoHeight);
-                try {
-                    decoder.prepare();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if (encoder != null) {
-                    // Wait if last encoder has not finished
-                    do {
-                        Thread.sleep(100);
-                    } while (encoder.isRunning());
-
-                    Log.i(TAG, String.format(
-                        "Encoded %d video %d ms", videoIndex, System.currentTimeMillis() - startMs));
-
-                    videoIndex ++;
-
-                    // Limit video index
-                    //if (videoIndex >= endIndex)
-                    //    break;
-                }
-
-                // Update process
-                updateProgressInUI(videoIndex,
-                        String.format(Locale.CHINA, "[%d%%] %d %s",
-                                (videoIndex + 1) * 100/(datasetCount[datasetIndex]),
-                                videoIndex, loader.getCurrentFileName()));
-
-                // Wait 100ms for next encoder
-                Thread.sleep(100);
-
-                encoder = new AVCEncoder(videoWidth, videoHeight, frameRate, bitrate);
-                encoder.setFFmpegAVIDecoder(decoder);
-                encoder.setOutputH264Path(outputH264Path);
-                encoder.startAsync();  // Async Mode
-
-                startMs = System.currentTimeMillis();
-            }
-
-            // Last one video
-            if (encoder != null) {
-                do {
-                    Thread.sleep(100);
-                } while (encoder.isRunning());
-                Log.i(TAG, String.format(
-                        "Encoded %d video %d ms", videoIndex, System.currentTimeMillis() - startMs));
-            }
-
-            loader.close();
-            Log.i(TAG, "Dataset loader closed");
-
-            // Update process when finished
-            updateFinishedProgressInUI();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+//
+//        try {
+//            // Print setting
+//            Log.i(TAG, String.format(Locale.CHINA,
+//                    "Current setting is\n" +
+//                            "Video Size:%d*%d\n" +
+//                            "Frame Rate:%d\n" +
+//                            "Bitrate:%d\n" +
+//                            "Start Index:%d", videoWidth, videoHeight, frameRate, bitrate, startIndex));
+//
+//            // Count down for 3 seconds
+//            Log.i(TAG, "Task will start after 3s");
+//            int countDown = 3;
+//            while (countDown >= 0) {
+//                updateCountDownInUI(countDown);
+//                countDown --;
+//                Thread.sleep(1000);
+//                // Maybe pause during count down
+//                if (exitFlag) {
+//                    updateInitProgressInUI();
+//                    return;
+//                }
+//            }
+//
+//            final String sdCardDirectory = "/storage/emulated/0/";
+//
+//            String listPath;
+//            switch (datasetIndex) {
+//                case 0:
+//                case 1:
+//                    listPath = datalistPath[0];
+//                    break;
+//                case 2:
+//                    listPath = datalistPath[1];
+//                    break;
+//                case 3:
+//                    listPath = datalistPath[2];
+//                    break;
+//                default:
+//                    listPath = null;
+//            }
+//
+//            DataSetLoader loader = new DataSetLoader(
+//                    // List File
+//                    sdCardDirectory + listPath,
+//                    // Input File Directory
+//                    sdCardDirectory + datasetPath[datasetIndex],
+//                    // Output File Directory
+//                    sdCardDirectory + "LocalAction/UCF-101-H264");
+//            Log.i(TAG, "Dataset loader created");
+//
+//            int videoIndex = 0;
+//            //int videoCount = Integer.MAX_VALUE;
+//            //int endIndex = startIndex + videoCount;
+//            boolean ret;
+//            String filePath;
+//            File file;
+//            AVCEncoder encoder = null;
+//            long startMs = 0;
+//
+//            while (!exitFlag && (filePath = loader.getNextFileItemPath(DataSetLoader.TYPE_AVI)) != null) {
+//                //Log.i("DataSetLoader", String.format(Locale.CHINA, "Load file %s", filePath));
+//
+//                // Check input file path
+//                file = new File(filePath);
+//                if (!file.exists()) {
+//                    continue;
+//                }
+//                // Skip video before start index
+//                if (videoIndex < startIndex) {
+//                    // Update process
+//                    updateProgressInUI(videoIndex, String.format(Locale.CHINA, "Skip %s", loader.getCurrentFileName()));
+//                    videoIndex ++;
+//                    continue;
+//                }
+//
+//                String outFilePath = loader.getCurrentOutFileItemPath(DataSetLoader.TYPE_H264);
+//
+//                // Check output file path
+//                file = new File(outFilePath).getParentFile();
+//                if (!file.exists()) {
+//                    ret = file.mkdirs();
+//                }
+//
+//                String inputAVIFilePath = filePath;
+//                String outputH264Path   = outFilePath;
+//
+//                // Create and initialize ffmpeg avi decoder
+//                FFmpegAVIDecoder decoder = new FFmpegAVIDecoder();
+//                decoder.setInputFilename(inputAVIFilePath);
+//                decoder.setVideoInfo(videoWidth, videoHeight);
+//                try {
+//                    decoder.prepare();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                if (encoder != null) {
+//                    // Wait if last encoder has not finished
+//                    do {
+//                        Thread.sleep(100);
+//                    } while (encoder.isRunning());
+//
+//                    Log.i(TAG, String.format(
+//                        "Encoded %d video %d ms", videoIndex, System.currentTimeMillis() - startMs));
+//
+//                    videoIndex ++;
+//
+//                    // Limit video index
+//                    //if (videoIndex >= endIndex)
+//                    //    break;
+//                }
+//
+//                // Update process
+//                updateProgressInUI(videoIndex,
+//                        String.format(Locale.CHINA, "[%d%%] %d %s",
+//                                (videoIndex + 1) * 100/(datasetCount[datasetIndex]),
+//                                videoIndex, loader.getCurrentFileName()));
+//
+//                // Wait 100ms for next encoder
+//                Thread.sleep(100);
+//
+//                encoder = new AVCEncoder(videoWidth, videoHeight, frameRate, bitrate);
+//                encoder.setFFmpegAVIDecoder(decoder);
+//                encoder.setOutputH264Path(outputH264Path);
+//                encoder.startAsync();  // Async Mode
+//
+//                startMs = System.currentTimeMillis();
+//            }
+//
+//            // Last one video
+//            if (encoder != null) {
+//                do {
+//                    Thread.sleep(100);
+//                } while (encoder.isRunning());
+//                Log.i(TAG, String.format(
+//                        "Encoded %d video %d ms", videoIndex, System.currentTimeMillis() - startMs));
+//            }
+//
+//            loader.close();
+//            Log.i(TAG, "Dataset loader closed");
+//
+//            // Update process when finished
+//            updateFinishedProgressInUI();
+//        } catch (IOException | InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 }
